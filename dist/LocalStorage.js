@@ -1,3 +1,5 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 let LocalStoragePrefix = 'ls:';
 const LocalStorage = class {
     /**
@@ -18,8 +20,9 @@ const LocalStorage = class {
         localStorage.removeItem(this.getKeyWithPrefix(key));
     }
     static getItem(key, defaultValue) {
+        var _a;
         const item = localStorage.getItem(this.getKeyWithPrefix(key));
-        const value = JSON.parse(item)?.value;
+        const value = (_a = JSON.parse(item)) === null || _a === void 0 ? void 0 : _a.value;
         if (!value) {
             return defaultValue;
         }
@@ -78,5 +81,5 @@ const LocalStorage = class {
         return this.getItem(key);
     }
 };
-export default LocalStorage;
+exports.default = LocalStorage;
 //# sourceMappingURL=LocalStorage.js.map
