@@ -1,0 +1,24 @@
+{
+  "name": "typed-local-storage",
+  "version": "0.0.1",
+  "description": "Typed local storage. Mainly built this to save some of my pain points of local storage.",
+  "scripts": {
+    "postpublish": "PACKAGE_VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git tag $PACKAGE_VERSION && git push --tags",
+    "build": "tsc",
+    "build-example": "tsc --build tsconfig.example.json",
+    "deploy-update": "./dist.sh"
+  },
+  "keywords": [],
+  "repository": {
+    "url": "https://github.com/iDevelopThings/TypedLocalStorage",
+    "type": "github"
+  },
+  "author": {
+    "name": "iDevelopThings",
+    "url": "https://github.com/iDevelopThings"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^4.3.5"
+  }
+}
