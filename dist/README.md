@@ -2,6 +2,12 @@
 
 A nice easy api for interacting with localStorage and keeping type safety.
 
+# Install the package:
+```shell
+yarn add typesafe-local-storage 
+npm install typesafe-local-storage
+```
+
 # Some examples:
 
 **Set an item**
