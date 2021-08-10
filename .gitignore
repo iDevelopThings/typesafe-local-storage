@@ -11,3 +11,4 @@ node_modules/
 /example/dist.example.js
 /example/mix-manifest.json
 /dist/
+/.idea/workspace.xml
