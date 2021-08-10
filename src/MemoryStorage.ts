@@ -1,20 +1,19 @@
 import {StorageService, StorageServiceType, StoredItem} from "./StorageService";
 import {StorageServiceWithEventsImpl} from "./StorageServiceWithEventsImpl";
 
+let MemoryStoragePrefix = 'ls:';
 
-let LocalStoragePrefix = 'ls:';
+class MemoryStorageService implements StorageService {
 
-export class LocalStorageService implements StorageService {
+	private values: Record<string, StoredItem<any>> = {};
 
 	/**
-	 * Clear all items from localStorage that are using our prefix
+	 * Clear all items from memory storage
 	 */
 	clear() {
-		const values = Object.keys(localStorage);
-
-		values
-			.filter(key => key.startsWith(LocalStoragePrefix))
-			.forEach(key => this.delete(key.replace(LocalStoragePrefix, '')));
+		for (let valuesKey in this.values) {
+			this.delete(valuesKey.replace(MemoryStoragePrefix, ''));
+		}
 	}
 
 	/**
@@ -23,7 +22,11 @@ export class LocalStorageService implements StorageService {
 	 * @param {string} key
 	 */
 	delete<T>(key: string) {
-		localStorage.removeItem(this.getKeyWithPrefix(key));
+		if (!this.values.hasOwnProperty(this.getKeyWithPrefix(key))) {
+			return;
+		}
+
+		delete this.values[this.getKeyWithPrefix(key)];
 	}
 
 	/**
@@ -35,8 +38,8 @@ export class LocalStorageService implements StorageService {
 	get<T>(key: string): T | null;
 	get<T>(key: string, defaultValue: T): T | null;
 	get<T>(key: string, defaultValue?): T | null {
-		const item: string | null = localStorage.getItem(this.getKeyWithPrefix(key));
-		const data: StoredItem<T> = JSON.parse(item);
+
+		const data: StoredItem<T> = this.values[this.getKeyWithPrefix(key)];
 
 		const expiresAt = data?.expiresAt ? new Date(data?.expiresAt) : undefined;
 		const value     = data?.value;
@@ -46,7 +49,6 @@ export class LocalStorageService implements StorageService {
 
 			if (currentTime > expiresAt.getTime()) {
 				this.delete(key);
-
 				return defaultValue;
 			}
 		}
@@ -68,10 +70,10 @@ export class LocalStorageService implements StorageService {
 	set(key: string, value: any, expiresAt?: Date)
 	set(key: string, value: any);
 	set<T>(key: string, value: T, expiresAt?: Date) {
-		localStorage.setItem(this.getKeyWithPrefix(key), JSON.stringify({
+		this.values[this.getKeyWithPrefix(key)] = {
 			value : value,
 			expiresAt,
-		}));
+		};
 	}
 
 	/**
@@ -81,7 +83,7 @@ export class LocalStorageService implements StorageService {
 	 * @returns {string}
 	 */
 	getKeyWithPrefix(key: string): string {
-		return `${LocalStoragePrefix}${key}`;
+		return `${MemoryStoragePrefix}${key}`;
 	}
 
 	/**
@@ -90,7 +92,7 @@ export class LocalStorageService implements StorageService {
 	 * @param {string} prefix
 	 */
 	setPrefix(prefix: string) {
-		LocalStoragePrefix = prefix;
+		MemoryStoragePrefix = prefix;
 	}
 
 	/**
@@ -132,12 +134,12 @@ export class LocalStorageService implements StorageService {
 	}
 }
 
-const LocalStorage = new LocalStorageService();
+const MemoryStorage = new MemoryStorageService();
 
-const LocalStorageWithEvents = new StorageServiceWithEventsImpl(
-	StorageServiceType.LOCAL,
-	LocalStorage
+const MemoryStorageWithEvents = new StorageServiceWithEventsImpl(
+	StorageServiceType.MEMORY,
+	MemoryStorage
 );
 
-export {LocalStorage, LocalStorageWithEvents};
+export {MemoryStorage, MemoryStorageWithEvents};
 

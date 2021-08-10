@@ -5,8 +5,17 @@ export interface StorageService {
 	 *
 	 * @param {string} key
 	 * @param {any} value
+	 * @param {Date} expiresAt
 	 */
-	setItem(key: string, value: any);
+	set(key: string, value: any, expiresAt?: Date);
+
+	/**
+	 * Store a new item in local storage
+	 *
+	 * @param {string} key
+	 * @param {any} value
+	 */
+	set(key: string, value: any);
 
 	/**
 	 * Store a new item in local storage
@@ -14,14 +23,14 @@ export interface StorageService {
 	 * @param {string} key
 	 * @param {T} value
 	 */
-	setItem<T>(key: string, value: T);
+	set<T>(key: string, value: T);
 
 	/**
 	 * Delete a specific item by key
 	 *
 	 * @param {string} key
 	 */
-	deleteItem<T>(key: string);
+	delete<T>(key: string);
 
 	/**
 	 * Get an item from local storage, correctly typed.
@@ -29,16 +38,7 @@ export interface StorageService {
 	 * @param {string} key
 	 * @returns {T | null}
 	 */
-	getItem<T>(key: string): T | null;
-
-	/**
-	 * Get an item from local storage, correctly typed.
-	 *
-	 * @param {string} key
-	 * @param {T} defaultValue
-	 * @returns {T | null}
-	 */
-	getItem<T>(key: string, defaultValue: T): T | null;
+	get<T>(key: string): T | null;
 
 	/**
 	 * Get an item from local storage, correctly typed.
@@ -47,7 +47,16 @@ export interface StorageService {
 	 * @param {T} defaultValue
 	 * @returns {T | null}
 	 */
-	getItem<T>(key: string, defaultValue?: T): T | null;
+	get<T>(key: string, defaultValue: T): T | null;
+
+	/**
+	 * Get an item from local storage, correctly typed.
+	 *
+	 * @param {string} key
+	 * @param {T} defaultValue
+	 * @returns {T | null}
+	 */
+	get<T>(key: string, defaultValue?: T): T | null;
 
 	/**
 	 * Set the prefix for this local storage instance
@@ -96,3 +105,13 @@ export interface StorageService {
 
 }
 
+export type StoredItem<T extends any> = {
+	value: T;
+	expiresAt?: Date | undefined
+}
+
+
+export enum StorageServiceType {
+	MEMORY = 'MemoryStorage',
+	LOCAL  = 'LocalStorage',
+}

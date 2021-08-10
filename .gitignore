@@ -8,5 +8,6 @@ node_modules/
 /.idea/inspectionProfiles/Project_Default.xml
 /.idea/vcs.xml
 /.idea/typesafe-local-storage.iml
-/example/
+/example/dist.example.js
+/example/mix-manifest.json
 /dist/
