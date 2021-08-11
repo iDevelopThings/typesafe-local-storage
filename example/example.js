@@ -2,14 +2,24 @@
  * @type MemoryStorage
  * @type LocalStorage
  */
-import {LocalStorageWithEvents, MemoryStorageWithEvents} from './../dist/index.js';
+import {LocalStorage, MemoryStorage} from './../dist/index.js';
 
-LocalStorageWithEvents.onChange('Testing', (value) => {
-	console.log('Changed: ', value);
+LocalStorage.onAny((type, key, value, oldValue) => {
+	console.log('onAny: ', type, key, value, oldValue)
 })
 
-MemoryStorageWithEvents.set('TestingMemory', 'woop');
-console.log('TestingMemory', MemoryStorageWithEvents.get('TestingMemory'));
+LocalStorage.onChange('TestingMemory', (value) => {
+	console.log('Changed: ', value);
+})
+LocalStorage.onAdd('TestingMemory', (value) => {
+	console.log('Added: ', value);
+})
+LocalStorage.onDelete('TestingMemory', (value) => {
+	console.log('Deleted: ', value);
+})
+
+MemoryStorage.set('TestingMemory', 'woop');
+console.log('TestingMemory', MemoryStorage.get('TestingMemory'));
 
 const testExpiring = (storage, key) => {
 	storage.set(key, 'woop', new Date(new Date().getTime() + (5 * 1000)));
@@ -22,14 +32,14 @@ const testExpiring = (storage, key) => {
 	}, 6000);
 };
 
-testExpiring(MemoryStorageWithEvents, 'TestingExpiresAtMemoryStorageWithEvents');
-testExpiring(LocalStorageWithEvents, 'TestingExpiresAtLocalStorageWithEvents');
+testExpiring(MemoryStorage, 'TestingExpiresAtMemoryStorage');
+testExpiring(LocalStorage, 'TestingExpiresAtLocalStorage');
 
-LocalStorageWithEvents.set('Testing', {testing : true});
-LocalStorageWithEvents.set('Testing', {testing : false});
+LocalStorage.set('Testing', {testing : true});
+LocalStorage.set('Testing', {testing : false});
 
-const item    = LocalStorageWithEvents.get('Testing', null);
-const itemTwo = LocalStorageWithEvents.get('Some-none-existing-item');
+const item    = LocalStorage.get('Testing', null);
+const itemTwo = LocalStorage.get('Some-none-existing-item');
 
-console.log(item);
-console.log(itemTwo);
+console.log('item: ', item);
+console.log('itemTwo: ', itemTwo);

@@ -1,11 +1,17 @@
+import {EmitsEvents, EventListenerCallback, EventListenerType, ServiceWithEvents} from "./EmitsEvents";
+import {ServiceEventEmitter} from "./ServiceEventEmitter";
 import {StorageService, StorageServiceType, StoredItem} from "./StorageService";
-import {StorageServiceWithEventsImpl} from "./StorageServiceWithEventsImpl";
 
 let MemoryStoragePrefix = 'ls:';
 
-class MemoryStorageService implements StorageService {
+class MemoryStorageService extends ServiceEventEmitter implements StorageService {
 
 	private values: Record<string, StoredItem<any>> = {};
+
+
+	constructor() {
+		super(MemoryStoragePrefix, StorageServiceType.MEMORY);
+	}
 
 	/**
 	 * Clear all items from memory storage
@@ -25,6 +31,8 @@ class MemoryStorageService implements StorageService {
 		if (!this.values.hasOwnProperty(this.getKeyWithPrefix(key))) {
 			return;
 		}
+
+		this.eventHandler.emit(EventListenerType.DELETE, key, undefined);
 
 		delete this.values[this.getKeyWithPrefix(key)];
 	}
@@ -70,6 +78,12 @@ class MemoryStorageService implements StorageService {
 	set(key: string, value: any, expiresAt?: Date)
 	set(key: string, value: any);
 	set<T>(key: string, value: T, expiresAt?: Date) {
+		const exists                      = this.exists(key);
+		const eventType                   = exists ? EventListenerType.CHANGE : EventListenerType.ADD;
+		const [eventValue, newEventValue] = exists ? [this.get(key), value] : [value, undefined];
+
+		this.eventHandler.emit(eventType, key, eventValue, newEventValue);
+
 		this.values[this.getKeyWithPrefix(key)] = {
 			value : value,
 			expiresAt,
@@ -136,10 +150,5 @@ class MemoryStorageService implements StorageService {
 
 const MemoryStorage = new MemoryStorageService();
 
-const MemoryStorageWithEvents = new StorageServiceWithEventsImpl(
-	StorageServiceType.MEMORY,
-	MemoryStorage
-);
-
-export {MemoryStorage, MemoryStorageWithEvents};
+export {MemoryStorage};
 

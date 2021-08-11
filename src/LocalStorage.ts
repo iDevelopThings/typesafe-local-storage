@@ -1,10 +1,15 @@
+import {EventListenerType} from "./EmitsEvents";
+import {ServiceEventEmitter} from "./ServiceEventEmitter";
 import {StorageService, StorageServiceType, StoredItem} from "./StorageService";
-import {StorageServiceWithEventsImpl} from "./StorageServiceWithEventsImpl";
 
 
 let LocalStoragePrefix = 'ls:';
 
-export class LocalStorageService implements StorageService {
+export class LocalStorageService extends ServiceEventEmitter implements StorageService {
+
+	constructor() {
+		super(LocalStoragePrefix, StorageServiceType.LOCAL);
+	}
 
 	/**
 	 * Clear all items from localStorage that are using our prefix
@@ -23,6 +28,8 @@ export class LocalStorageService implements StorageService {
 	 * @param {string} key
 	 */
 	delete<T>(key: string) {
+		this.eventHandler.emit(EventListenerType.DELETE, key, undefined);
+
 		localStorage.removeItem(this.getKeyWithPrefix(key));
 	}
 
@@ -68,6 +75,12 @@ export class LocalStorageService implements StorageService {
 	set(key: string, value: any, expiresAt?: Date)
 	set(key: string, value: any);
 	set<T>(key: string, value: T, expiresAt?: Date) {
+		const exists                      = this.exists(key);
+		const eventType                   = exists ? EventListenerType.CHANGE : EventListenerType.ADD;
+		const [eventValue, newEventValue] = exists ? [this.get(key), value] : [value, undefined];
+
+		this.eventHandler.emit(eventType, key, eventValue, newEventValue);
+
 		localStorage.setItem(this.getKeyWithPrefix(key), JSON.stringify({
 			value : value,
 			expiresAt,
@@ -130,14 +143,10 @@ export class LocalStorageService implements StorageService {
 
 		return this.get<T>(key);
 	}
+
 }
 
 const LocalStorage = new LocalStorageService();
 
-const LocalStorageWithEvents = new StorageServiceWithEventsImpl(
-	StorageServiceType.LOCAL,
-	LocalStorage
-);
-
-export {LocalStorage, LocalStorageWithEvents};
+export {LocalStorage};
 

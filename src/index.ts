@@ -1,9 +1,7 @@
-import {LocalStorage, LocalStorageWithEvents} from "./LocalStorage";
-import {MemoryStorage, MemoryStorageWithEvents} from "./MemoryStorage";
+import {LocalStorage} from "./LocalStorage";
+import {MemoryStorage} from "./MemoryStorage";
 
 export {
 	LocalStorage,
-	LocalStorageWithEvents,
 	MemoryStorage,
-	MemoryStorageWithEvents,
 };

@@ -11,7 +11,14 @@ npm install typesafe-local-storage
 
 **You can also use Memory Storage**
 This follows the same api as LocalStorage, but just uses memory.
+```ts
+import {MemoryStorage} from 'typesafe-local-storage';
 
+MemoryStorage.set(...)
+MemoryStorage.get(...)
+// etc
+
+```
 # WIP:
 
 Events for change, update, delete actions.
@@ -19,17 +26,23 @@ Events for change, update, delete actions.
 Example:
 
 ```ts
-import {LocalStorageWithEvents} from 'typesafe-local-storage';
+import {LocalStorage} from 'typesafe-local-storage';
 
-LocalStorageWithEvents.onChange('test-item', (oldValue, newValue) => {
+LocalStorage.onChange('test-item', (oldValue, newValue) => {
 	console.log(oldValue, newValue);
 	// emits:
 	// "hello"
 	// "hello world"
 });
+LocalStorage.onAny((type, key, value, oldValue) => {
+	console.log(type, key, value, oldValue);
+	// emits:
+	// "add", "test-item", "hello", undefined
+	// "change", "test-item", "hello world", "hello"
+});
 
-LocalStorageWithEvents.set('test-item', 'hello');
-LocalStorageWithEvents.set('test-item', 'hello world');
+LocalStorage.set('test-item', 'hello');
+LocalStorage.set('test-item', 'hello world');
 
 ```
 
